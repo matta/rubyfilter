@@ -311,7 +311,14 @@ module RFilter
           |io|
           assert_equal([], io.readlines)
         }
-        assert_equal(255 << 8, status)
+        if status.respond_to?(:exited?)
+          # ruby 1.8
+          assert(status.exited?)
+          assert(1 == status.exitstatus || 255 == status.exitstatus)
+        else
+          # before ruby 1.8
+          assert_equal((255 << 8), status)
+        end
       end
 
       def test_deliver_filter_badexit()

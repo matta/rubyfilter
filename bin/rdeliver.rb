@@ -186,7 +186,11 @@ begin
       end
     end
     RFilter::DeliveryAgent.process(STDIN, log) { |agent|
-      eval(IO.readlines(config, nil)[0].untaint,
+      # IO.readlines used this way seems to have crapped out as of
+      # ruby 1.8.1.
+      # input = IO.readlines(config, nil)[0].untaint,
+      input = File.new(config).read.untaint
+      eval(input,
            Deliver.module_eval('binding()'),
            config)
       Deliver.new(agent).main
