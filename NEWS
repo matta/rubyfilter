@@ -1,3 +1,9 @@
+= Changes in RubyFilter 0.11 (released 2003-09-17)
+
+- Ruby 1.8.0 compatability changes.
+- No longer verify that a unix mbox file is in the correct format before
+  appending to it.
+
 = Changes in RubyFilter 0.10 (released 2003-02-04)
 
 - Add RFilter::Deliver.write_to_mbox that writes to an already open

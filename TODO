@@ -2,7 +2,8 @@
 
 = Bug Fixes
 
-  - Maildir delivery is unsafe.
+  - Maildir delivery is unsafe.  See new
+    http://cr.yp.to/proto/maildir.html
 
 = Features
 

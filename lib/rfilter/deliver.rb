@@ -1,10 +1,31 @@
-=begin
-   Copyright (C) 2001, 2002, 2003 Matt Armstrong.  All rights reserved.
-
-   Permission is granted for use, copying, modification, distribution,
-   and distribution of modified versions of this work as long as the
-   above copyright notice is included.
-=end
+#
+#   Copyright (C) 2001, 2002, 2003 Matt Armstrong.  All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. The name of the author may not be used to endorse or promote
+#    products derived from this software without specific prior
+#    written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
 module RFilter
 
@@ -42,7 +63,7 @@ module RFilter
     def deliver_mbox(filename, message)
       return filename if filename == '/dev/null'
       File.open(filename,
-                File::RDWR|File::CREAT|SYNC_IF_NO_FSYNC,
+                File::APPEND|File::WRONLY|File::CREAT|SYNC_IF_NO_FSYNC,
 		0600) { |f|
         max = 5
         max.times { |i|
@@ -54,10 +75,6 @@ module RFilter
         unless st.file?
           raise NotAFile,
             "Can not deliver to #{filename}, not a regular file."
-        end
-        unless is_an_mbox(f, st)
-          raise NotAMailbox,
-            "Can not deliver to #{filename}, file is not in mbox format."
         end
         begin
           # Ignore SIGXFSZ, since we want to get the Errno::EFBIG
@@ -234,7 +251,10 @@ module RFilter
       hostname = Socket::gethostname.gsub(/[^\w]/, '_').untaint
       pid = Process::pid
       3.times { |i|
-        name = sprintf("%d.%d_%d.%s", Time::now.to_i, pid, sequence, hostname)
+        now = Time::now
+        name = sprintf("%d.M%XP%dQ%d.%s",
+                       Time::now.tv_sec, Time::now.tv_usec,
+                       pid, sequence, hostname)
         tmp_name = File.join(tmp, name)
         new_name = File.join(new, name)
         begin
@@ -274,18 +294,6 @@ module RFilter
       new_name
     end
     module_function :deliver_maildir
-
-    private
-
-    def is_an_mbox(file, stat)
-      return true if stat.zero?
-      file.seek(0)
-      return false unless file.gets =~ /^From /
-      file.seek(-2, IO::SEEK_END)
-      return false unless file.read == "\n\n"
-      return true
-    end
-    module_function :is_an_mbox
 
   end
 end
