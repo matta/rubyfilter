@@ -6,9 +6,9 @@
 #   distribution, and distribution of modified versions of this work
 #   as long as the above copyright notice is included.
 #
-require 'mail/parser'
-require 'mail/address'
-require 'mail/serialize'
+require 'rmail/parser'
+require 'rmail/address'
+require 'rmail/serialize'
 
 def syslog(str)
   system('logger', '-p', 'mail.info', '-t', 'rsendmail', str.to_s)
@@ -50,7 +50,7 @@ message = RMail::Parser.new.parse($stdin)
 
 def get_recipients(message, field_name, list)
   unless message.header[field_name].nil?
-    RFilter::Address.parse(message.header[field_name]).each do |address|
+    RMail::Address.parse(message.header[field_name]).each do |address|
       # FIXME: need an "smtpaddress" method
       list.push(address.address)
     end
@@ -135,6 +135,6 @@ IO.popen('-', 'w') do |child|
     #syslog("args ouggoing: " + command.inspect)
     exec(*command)
   else
-    RFilter::Serialize.new(child).serialize(message)
+    RMail::Serialize.new(child).serialize(message)
   end
 end

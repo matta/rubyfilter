@@ -1,5 +1,5 @@
 =begin
-   Copyright (C) 2001, 2002 Matt Armstrong.  All rights reserved.
+   Copyright (C) 2001, 2002, 2003 Matt Armstrong.  All rights reserved.
 
    Permission is granted for use, copying, modification, distribution,
    and distribution of modified versions of this work as long as the
@@ -46,8 +46,8 @@ module RFilter
       end
     end
 
-    # Raised when the command run by #pipe fails.
-    class DeliveryPipeFailure < DeliveryComplete
+    # Raised when the command run by #pipe or #filter fails.
+    class DeliveryCommandFailure < DeliveryComplete
       # This is the exit status of the pipe command.
       attr_reader :status
       def initialize(message, status)
@@ -130,18 +130,18 @@ module RFilter
 
     # Reject this message.  Logs the +reason+ for the rejection and
     # raises a <tt>RFilter::DeliveryAgent::DeliveryReject</tt> exception.
-    def reject(reason)
-      log(2, "Action: reject: " + reason)
-      raise DeliveryReject.new(reason)
+    def reject(reason = nil)
+      log(2, "Action: reject: " + reason.to_s)
+      raise DeliveryReject.new(reason.to_s)
     end
 
     # Reject this message for now, but request that it be queued for
     # re-delivery in the future.  Logs the +reason+ for the rejection
     # and raises a <tt>RFilter::DeliveryAgent::DeliveryDefer</tt>
     # exception.
-    def defer(reason)
-      log(2, "Action: defer: " + reason)
-      raise DeliveryDefer.new(reason)
+    def defer(reason = nil)
+      log(2, "Action: defer: " + reason.to_s)
+      raise DeliveryDefer.new(reason.to_s)
     end
 
     # Pipe this message to a command.  +command+ must be a string
@@ -152,7 +152,7 @@ module RFilter
     # exception.  If +continue+ is true, then a successful delivery
     # will simply return.  Regardless of +continue+, a failure to
     # deliver to the pipe will raise a
-    # <tt>RFilter::DeliveryAgent::DeliveryPipeFailure</tt> exception.
+    # <tt>RFilter::DeliveryAgent::DeliveryCommandFailure</tt> exception.
     #
     # See also: <tt>RFilter::Deliver.deliver_pipe.</tt>
     def pipe(command, continue = false)
@@ -160,11 +160,36 @@ module RFilter
       deliver_pipe(command, @message)
       if $? != 0
 	m = "pipe failed for command #{command.inspect}"
-	raise DeliveryPipeFailure.new(m, $?)
+        log(1, "Error: " + m)
+	raise DeliveryCommandFailure.new(m, $?)
       end
       unless continue
 	raise DeliverySuccess.new("pipe to #{command.inspect}")
       end
+    end
+
+    # Filter this message through a command.  +command+ must be a
+    # string or an array of strings specifying a command to filter the
+    # message through (it is passed to the Kernel::exec method).
+    #
+    # If the command does not exit with a status of 0, a
+    # DeliveryCommandFailure exception is raised and the current
+    # message is not replaced.
+    #
+    # See also: <tt>RFilter::Deliver.deliver_filter.</tt>
+    def filter(*command)
+      log(2, "Action: filter through #{command.inspect}")
+      msg = nil
+      status = deliver_filter(@message, *command) { |io|
+        msg = RMail::Parser.new.parse(io)
+      }
+      if status != 0
+	m = format("filter failed for command %s (status %s)",
+                   command.inspect, status.inspect)
+        log(1, "Error: " + m)
+	raise DeliveryCommandFailure.new(m, status)
+      end
+      @message = msg
     end
 
     # Log a string to the log.  If the current log is nil or +level+
@@ -306,7 +331,7 @@ module RFilter
 	else
 	  raise ArgumentError,
 	    "argument is not a DeliveryComplete exception: " +
-	    "#{exception.inspect} (#{exception.type})"
+	    "#{exception.inspect} (#{exception.class})"
 	end
       end
 

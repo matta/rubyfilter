@@ -7,15 +7,15 @@
 #   above copyright notice is included.
 #
 #++
-# This script serves as an example of how you can use the RFilter::DeliveryAgent
-# class to perform mail delivery.  You can also use this script as a
-# fully functioning mail filter.
+# This script serves as an example of how you can use the
+# RFilter::DeliveryAgent class to perform mail delivery.  You can also
+# use this script as a fully functioning mail filter.
 #
-# This script is a basic mail local delivery agent (DeliveryAgent) that can be
-# used in place of procmail, maildrop, etc. in a user's .forward or
-# .qmail file.  The user supplies a delivery script that is written in
-# Ruby, which avoids the limitations of the crippled mini-languages so
-# often used in other DeliveryAgent programs.
+# This script is a basic mail local delivery agent (DeliveryAgent)
+# that can be used in place of procmail, maildrop, etc. in a user's
+# .forward or .qmail file.  The user supplies a delivery script that
+# is written in Ruby, which avoids the limitations of the crippled
+# mini-languages so often used in other DeliveryAgent programs.
 #
 # === Usage
 #
@@ -172,8 +172,9 @@ begin
       Deliver.new(agent).main
     }
   rescue RFilter::DeliveryAgent::DeliveryComplete => exception
-    if exception.is_a?(RFilter::DeliveryAgent::DeliveryDefer) ||
-        exception.is_a?(RFilter::DeliveryAgent::DeliveryReject)
+    if (exception.is_a?(RFilter::DeliveryAgent::DeliveryDefer) ||
+        exception.is_a?(RFilter::DeliveryAgent::DeliveryReject)) &&
+        exception.message && exception.message.length > 0
       puts exception.message
     end
     exit(RFilter::DeliveryAgent.exitcode(exception))
@@ -195,6 +196,10 @@ rescue Exception => exception
       end
       File.open("CATASTROPHIC_DELIVERY_FAILURE", "w") { |file|
 	print_exception(file, exception)
+        case exception
+        when LoadError
+          file.puts("Current $LOAD_PATH: %s" % $LOAD_PATH.inspect)
+        end
       }
     rescue Exception => another_exception
       # In the event that the above doesn't happen, we write the error

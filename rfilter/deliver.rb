@@ -126,6 +126,62 @@ module RFilter
     end
     module_function :deliver_pipe
 
+    # Deliver +message+ to a filter and provide the io stream for
+    # reading the filtered content to the supplied block.
+    #
+    # The supplied +command+ is run in a sub process, and
+    # <tt>message.each</tt> is used to get each line of the message
+    # and write it to the filter.
+    #
+    # The block passed to the function is run with IO objects for the
+    # stdout of the child process.
+    #
+    # Returns the exit status of the child process.
+    def deliver_filter(message, *command)
+      begin
+        to_r, to_w = IO.pipe
+        from_r, from_w = IO.pipe
+        if pid = fork
+          # parent
+          to_r.close
+          from_w.close
+          writer = Thread::new {
+            message.each { |line|
+              to_w << line
+              to_w << "\n" unless line[-1] == ?\n
+            }
+            to_w.close
+          }
+          yield from_r
+        else
+          # child
+          begin
+            to_w.close
+            from_r.close
+            STDIN.reopen(to_r)
+            to_r.close
+            STDOUT.reopen(from_w)
+            from_w.close
+            exec(*command)
+          ensure
+            exit!
+          end
+        end
+      ensure
+        writer.kill if writer and writer.alive?
+        [ to_r, to_w, from_r, from_w ].each { |io|
+          if io && !io.closed?
+            begin
+              io.close
+            rescue Errno::EPIPE
+            end
+          end
+        }
+      end
+      Process.waitpid2(pid, 0)[1]
+    end
+    module_function :deliver_filter
+
     # Delivery +message+ to a Maildir.
     #
     # See http://cr.yp.to/proto/maildir.html for a description of the
