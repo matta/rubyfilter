@@ -1,33 +1,48 @@
-* Changes in RubyFilter 0.9 (released 2002-01-16)
+= Changes in RubyFilter 0.10 (released 2003-02-04)
 
-** New DeliveryAgent#filter method that can be used to filter a message
-   through an external command, possibly changing the message.
+- Add RFilter::Deliver.write_to_mbox that writes to an already open
+  mailbox file.  This can be used when none of the anal checks,
+  locking, etc. that RFilter::Deliver.deliver_mbox does is
+  desireable.
 
-** DeliveryAgent::DeliveryPipeFailure renamed to
-   DeliveryAgent::DeliveryCommandFailure since it is now raised by
-   DeliveryAgent#pipe as well as DeliveryAgent#filter.
+- Add RFilter::KeyedMailbox#each_key and
+  RFilter::KeyedMailbox#key_mtime methods that can be used to
+  implement expiry when you want to process the message before it is
+  deleted.
 
-** DeliveryAgent#defer and DeliveryAgent#reject now have a default
-   argument for the message string.
+- DeliveryAgent#deliver_mbox now ignores the SIGXFSZ exception and
+  recovers from the EFBIG Errno exception.
 
-** Other changes to bring up to date with current RubyMail and Ruby
-   1.8.0.
+= Changes in RubyFilter 0.9 (released 2002-01-16)
 
-* Changes in RubyFilter 0.8 (released 2002-03-18)
+- New DeliveryAgent#filter method that can be used to filter a message
+  through an external command, possibly changing the message.
 
-** Created from RubyMail 0.7
+- DeliveryAgent::DeliveryPipeFailure renamed to
+  DeliveryAgent::DeliveryCommandFailure since it is now raised by
+  DeliveryAgent#pipe as well as DeliveryAgent#filter.
 
-** All Mail::* constants moved into the RFilter:: module.
+- DeliveryAgent#defer and DeliveryAgent#reject now have a default
+  argument for the message string.
 
-** Mail::Deliver.deliver_mbox returns the name of the file delivered
-   to.
+- Other changes to bring up to date with current RubyMail and Ruby
+  1.8.0.
 
-** rdeliver.rb now prints DeliveryDever and DeliveryReject messages to
-   stdout in the hopes that the MTA will include them in the bounce
-   message.
+= Changes in RubyFilter 0.8 (released 2002-03-18)
 
-** Renamed Mail::LDA to RFilter::DeliveryAgent.
+- Created from RubyMail 0.7
 
-** RFilter::Deliver.deliver_maildir -- bring in line with the
-   Maildir delivery spec (i.e. stat the tmp file before trying to open
-   it instead of relying on O_EXCL).
+- All Mail::* constants moved into the RFilter:: module.
+
+- Mail::Deliver.deliver_mbox returns the name of the file delivered
+  to.
+
+- rdeliver.rb now prints DeliveryDever and DeliveryReject messages to
+  stdout in the hopes that the MTA will include them in the bounce
+  message.
+
+- Renamed Mail::LDA to RFilter::DeliveryAgent.
+
+- RFilter::Deliver.deliver_maildir -- bring in line with the
+  Maildir delivery spec (i.e. stat the tmp file before trying to open
+  it instead of relying on O_EXCL).
