@@ -43,7 +43,7 @@ $lda.save('.incoming/backup-' + Time.now.strftime('%Y-%V'), true)
 
 # Check if we got this through bigfoot and bounce it if it looks
 # suspicious.
-if h.match?('delivered-to', /matt\+bigfoot@lickey\.com/) &&
+if h.match?('delivered-to', /matt\+bigfoot@example\.com/) &&
     h.match?('received', /from.*by.*bigfoot\.com.*LiteMail/m)
   temp = h.match('received', /from.*by.*bigfoot\.com.*LiteMail/m)[0]
   log(temp)
@@ -63,7 +63,7 @@ end
 # Attempt to do RBL lookups on bigfoot.com mail
 #
 #:0
-#* ^Delivered-To: matt\+bigfoot@lickey\.com
+#* ^Delivered-To: matt\+bigfoot@example\.com
 #* ^\/Received: from .*by.*bigfoot.com.*LiteMail
 #{
 #    :0
@@ -90,7 +90,7 @@ end
 #}
 
 # :0c
-# * ^From: relaytest@lickey.com
+# * ^From: relaytest@example.com
 # * ^Subject: open relay test for
 # ! qspam@orbz.org, relays@ordb.org
 
@@ -98,12 +98,12 @@ if h.match?('x-ml-name', /ruby-dev/)
   $lda.pipe('cat > /dev/null')
 end
 
-if h.match?('from', /matt@lickey\.com/) &&
+if h.match?('from', /matt@example\.com/) &&
     h.match?('subject', /testme bounce/)
   $lda.reject("You want to test a bounce?  I'll give you a bounce!")
 end
 
-if h.match?('delivered-to', /matt\+bmi@lickey\.com/)
+if h.match?('delivered-to', /matt\+bmi@example\.com/)
   if h.match?('sender', /bluemug-installs-admin@bluemug.com/)
     save('bmi.installs')
   end
@@ -121,19 +121,19 @@ if h.match?('delivered-to', /matt\+bmi@lickey\.com/)
   save('bmi')
 end
   
-if h.match?('from', /Cron Daemon|root@lickey\.com|uucp@lickey\.com/)
+if h.match?('from', /Cron Daemon|root@example\.com|uucp@example\.com/)
   $lda.save(".incoming/daemons.spool")
 end
 
 # FIXME: need a simpler forward mechanism
-if h.match?('from', /relaytest@lickey.com/) &&
+if h.match?('from', /relaytest@example.com/) &&
     h.match?('subject', /open relay test for/)
   $lda.pipe("/usr/sbin/sendmail -oi qspam@orbz.org relays@ordb.org")
 end
 
-if h.match?('from', /matt@lickey\.com/) &&
+if h.match?('from', /matt@example\.com/) &&
     h.match?('subject', /forward test/)
-  $lda.pipe("/usr/sbin/sendmail -oi matt+speakeasy@lickey.com")
+  $lda.pipe("/usr/sbin/sendmail -oi matt+speakeasy@example.com")
 end
 
 $lda.save(".incoming/inbox.spool")
