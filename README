@@ -5,11 +5,11 @@ delivering it to various mailbox formats.
 
 RubyFilter is available at:
 
-    http://www.example.com/rubyfilter/
+    https://github.com/matta/rubyfilter/
 
 RubyFilter depends on RubyMail, available at:
 
-    http://www.example.com/rubymail/
+    https://github.com/matta/rubymail/
 
 # Why?
 
@@ -77,4 +77,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Support
 
-To reach the author of RubyFilter, send mail to matt@example.com.
+To reach the author of RubyFilter, send mail to gmatta@gmail.com.
