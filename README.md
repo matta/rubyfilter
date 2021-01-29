@@ -36,9 +36,11 @@ See the doc/ subdirectory for HTML documentation.
 
 Type the following while in the package directory:
 
-  ruby install.rb config
-  ruby install.rb setup
-  ruby install.rb install
+```sh
+ruby install.rb config
+ruby install.rb setup
+ruby install.rb install
+```
 
 You may need special permissions to execute the last line.  If you
 want to just install RubyMail to a custom location, just copy the
@@ -51,7 +53,7 @@ run).
 
 # License
 
-Copyright (c) 2003 Matt Armstrong.  All rights reserved.
+Copyright (c) 2003, 2021 Matt Armstrong.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
