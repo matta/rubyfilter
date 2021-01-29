@@ -1,4 +1,4 @@
-= RubyFilter
+# RubyFilter
 
 This is a framework for filtering mail, possibly modifying it, and
 delivering it to various mailbox formats.
@@ -11,28 +11,28 @@ RubyFilter depends on RubyMail, available at:
 
     http://www.lickey.com/rubymail/
 
-= Why?
+# Why?
 
 The world needs alternatives to procmail.  I wanted one that allowed
 me to write a mail filter in a fully capable scripting language.
 
-= Status
+# Status
 
 This package is currently very raw.  All API is subject to change.  I
 very much appreciate suggestions and comments.
 
 However, I do use this for all of my own mail filtering.
 
-= Requirements
+# Requirements
 
 Ruby 1.6.* or Ruby 1.8.*.  Only tested under Linux, should be fine
 under any Unix.
 
-= Documentation
+# Documentation
 
 See the doc/ subdirectory for HTML documentation.
 
-= Install
+# Install
 
 Type the following while in the package directory:
 
@@ -44,12 +44,12 @@ You may need special permissions to execute the last line.  If you
 want to just install RubyMail to a custom location, just copy the
 rmail subdirectory manually.
 
-= Tests?
+# Tests?
 
 This package has a complete unit test suite (requires RubyUnit to
 run).
 
-= License
+# License
 
 Copyright (c) 2003 Matt Armstrong.  All rights reserved.
 
@@ -75,6 +75,6 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-= Support
+# Support
 
 To reach the author of RubyFilter, send mail to matt@lickey.com.
